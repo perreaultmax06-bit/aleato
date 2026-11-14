@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#11101f"><meta name="description" content="ALÉATO — Arrête de réfléchir. Laisse le hasard choisir!">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>ALÉATO — Laisse le hasard choisir</title>
+<style>
+:root{--bg:#11101f;--panel:#201e35;--line:#3c3857;--ink:#fff;--muted:#bcb8d0;--pink:#ff719e;--yellow:#ffd166;--mint:#83e0bd}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% -10%,#423064 0,transparent 42%),var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh}
+main{max-width:560px;margin:auto;padding:20px 17px 36px}.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}.brand{font-weight:950;font-size:24px;letter-spacing:-1px}.brand span{color:var(--pink)}.lang{background:#282541;border:1px solid var(--line);color:white;padding:8px 12px;border-radius:12px;font-weight:750}
+h1{font-size:36px;line-height:1.02;letter-spacing:-1.5px;margin:0 0 9px}.sub{color:var(--muted);margin:0 0 22px;line-height:1.45}
+.cats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:18px}.cat{border:1px solid var(--line);background:var(--panel);color:white;border-radius:15px;padding:12px 5px;font-weight:700;font-size:13px}.cat b{display:block;font-size:23px;margin-bottom:3px}.cat.active{background:#42283f;border-color:var(--pink);box-shadow:inset 0 0 0 1px var(--pink)}
+.panel{background:linear-gradient(145deg,#2b2847,#1b192e);border:1px solid var(--line);border-radius:24px;padding:18px;text-align:center;box-shadow:0 18px 45px #0004}.pointer{width:0;height:0;border-left:13px solid transparent;border-right:13px solid transparent;border-top:22px solid white;margin:0 auto -5px;position:relative;z-index:2}.wheel{width:205px;height:205px;margin:0 auto 17px;border-radius:50%;border:7px solid white;background:conic-gradient(#ff739f 0 60deg,#ffd166 60deg 120deg,#7bc9ff 120deg 180deg,#8de0bd 180deg 240deg,#b69aff 240deg 300deg,#ff9f68 300deg);box-shadow:0 8px 25px #0007;position:relative;transition:transform 2.3s cubic-bezier(.12,.8,.15,1)}.wheel:after{content:"🎲";display:grid;place-items:center;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:58px;height:58px;border-radius:50%;background:white;font-size:29px;border:5px solid #292542}
+.primary{width:100%;border:0;border-radius:15px;padding:15px;background:linear-gradient(90deg,var(--pink),#ff9c75);color:#261427;font-size:16px;font-weight:900}.primary:disabled{opacity:.6}
+.result{display:none;text-align:left;margin-top:15px;padding:15px;border-radius:16px;background:#11101f;border:1px solid #51466d}.result small{color:var(--yellow);font-weight:850;letter-spacing:1px}.result h2{margin:6px 0;font-size:23px}.result p{color:var(--muted);margin:0 0 13px;line-height:1.45}.actions{display:flex;gap:8px}.secondary{flex:1;background:#292642;color:white;border:1px solid #4b4668;border-radius:12px;padding:11px;font-weight:750}
+.section{margin-top:24px}.sectionhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.sectionhead h3{font-size:17px;margin:0}.sectionhead button{background:none;border:0;color:var(--yellow);font-weight:750}.idea{display:flex;gap:11px;align-items:center;background:var(--panel);border:1px solid #302d49;padding:12px;border-radius:14px;margin-bottom:8px}.emoji{font-size:25px}.idea strong{display:block;font-size:14px}.idea small{color:var(--muted)}.fav{margin-left:auto;background:none;border:0;color:#fff;font-size:22px;padding:5px}.empty{color:var(--muted);font-size:14px;padding:14px;background:var(--panel);border-radius:14px}
+.foot{text-align:center;color:#8985a1;font-size:11px;margin-top:22px}.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#fff;color:#171326;padding:11px 16px;border-radius:30px;font-weight:750;display:none;box-shadow:0 8px 25px #0006;max-width:90%;text-align:center}
+</style></head>
+<body><main>
+<header class="top"><div class="brand">ALÉA<span>TO</span> 🎲</div><button class="lang" id="lang">EN</button></header>
+<h1 id="heading">On fait quoi<br>aujourd’hui?</h1><p class="sub" id="subtitle">Plus besoin de chercher pendant 20 minutes. Laisse le hasard choisir pour toi.</p>
+<div class="cats" id="cats"></div>
+<section class="panel"><div class="pointer"></div><div class="wheel" id="wheel"></div><button class="primary" id="spin">🎯 Choisis pour moi !</button>
+<div class="result" id="result"><small id="resultLabel">TON IDÉE SURPRISE</small><h2 id="resultTitle"></h2><p id="resultDesc"></p><div class="actions"><button class="secondary" id="again">🔄 Encore</button><button class="secondary" id="save">♡ Favori</button></div></div></section>
+<section class="section"><div class="sectionhead"><h3 id="ideasTitle">💡 Idées à essayer</h3><button id="favToggle">♡ Favoris</button></div><div id="ideas"></div></section>
+<p class="foot" id="foot">Gratuit • Sans inscription • Favoris enregistrés sur cet appareil</p></main><div class="toast" id="toast"></div>
+<script>
+const words={
+fr:{cats:[["Tout","🎲","Surprise"],["Couple","❤️","En couple"],["Amis","🧑‍🤝‍🧑","Entre amis"],["Maison","🏠","À la maison"],["Dehors","🌳","Dehors"],["Manger","🍕","À manger"]],heading:"On fait quoi<br>aujourd’hui?",sub:"Plus besoin de chercher pendant 20 minutes. Laisse le hasard choisir pour toi.",spin:"🎯 Choisis pour moi !",again:"🔄 Encore",save:"♡ Favori",label:"TON IDÉE SURPRISE",ideas:"💡 Idées à essayer",favs:"♡ Favoris",foot:"Gratuit • Sans inscription • Favoris enregistrés sur cet appareil",empty:"Pas encore de favoris. Garde tes idées préférées ici.",saved:"Ajouté aux favoris !",already:"Déjà dans tes favoris.",count:"idées"},
+en:{cats:[["Tout","🎲","Surprise"],["Couple","❤️","Date night"],["Amis","🧑‍🤝‍🧑","With friends"],["Maison","🏠","At home"],["Dehors","🌳","Outdoors"],["Manger","🍕","Food"]],heading:"What should we<br>do today?",sub:"Stop scrolling and overthinking. Let chance pick something for you.",spin:"🎯 Pick for me!",again:"🔄 Try again",save:"♡ Save",label:"YOUR RANDOM IDEA",ideas:"💡 Ideas to try",favs:"♡ Favorites",foot:"Free • No sign-up • Favorites saved on this device",empty:"No favorites yet. Save your favorite ideas here.",saved:"Added to favorites!",already:"Already in your favorites.",count:"ideas"}
+};
+const data=[
+["Cook a themed dinner","Pick a country and make a dish inspired by it.","🍝",["Couple","Maison","Manger"],"Préparez un souper thématique","Choisissez un pays et cuisinez un plat inspiré de cet endroit."],
+["Take a walk with no destination","Pick a direction and discover somewhere new.","🚶",["Couple","Amis","Dehors"],"Allez marcher sans destination","Choisissez une direction et découvrez un coin nouveau."],
+["Have a game night","Bring out a board game or try a trivia challenge.","🎲",["Couple","Amis","Maison"],"Organisez une soirée jeux","Sortez un jeu de société ou lancez un jeu-questionnaire."],
+["Try a new café","Find a place you have never visited.","☕",["Couple","Amis","Dehors"],"Essayez un nouveau café","Trouvez un endroit où vous n’êtes jamais allés."],
+["Photo challenge","Each take five photos based on a random theme.","📸",["Couple","Amis","Dehors"],"Faites un défi photo","Prenez chacun cinq photos sur un thème choisi au hasard."],
+["Movie night","Pick a genre, make popcorn and let chance pick the movie.","🍿",["Couple","Amis","Maison"],"Soirée cinéma thématique","Choisissez un genre, préparez du popcorn et laissez le hasard décider."],
+["Try a new recipe","Choose something you have never cooked before.","🥘",["Maison","Manger","Couple"],"Testez une nouvelle recette","Choisissez une recette que vous n’avez jamais faite."],
+["Plan a picnic","Pack some snacks and find a nice outdoor spot.","🧺",["Couple","Amis","Dehors","Manger"],"Faites un pique-nique","Préparez quelques collations et trouvez un joli endroit dehors."],
+["One-hour phone-free challenge","Put your phones away and do something together.","📵",["Couple","Amis","Maison"],"Défi sans téléphone","Mettez vos téléphones de côté et faites une activité ensemble."],
+["Explore a new neighborhood","Walk around and stop somewhere that catches your eye.","🗺️",["Couple","Amis","Dehors"],"Découvrez un nouveau quartier","Promenez-vous et arrêtez-vous dans un commerce qui vous intrigue."],
+["Order something new","Try a dish you have never tasted.","🍜",["Manger","Couple","Amis"],"Commandez quelque chose d'inconnu","Choisissez un plat que vous n’avez jamais goûté."],
+["Build a cozy blanket fort","Pillows, blankets and a relaxing night in.","🛋️",["Maison","Couple"],"Construisez une cabane confortable","Couvertures, coussins et soirée relax."]
+];
+let lang="fr",cat="Tout",current=null,turn=0,showFav=false;
+const $=x=>document.getElementById(x), tr=()=>words[lang];
+function activities(){return data.map(x=>({t:lang==="fr"?x[4]:x[0],d:lang==="fr"?x[5]:x[1],e:x[2],c:x[3],key:x[0]}))}
+function favorites(){try{return JSON.parse(localStorage.getItem("aleato_favs")||"[]")}catch{return []}}
+function toast(s){$("toast").textContent=s;$("toast").style.display="block";setTimeout(()=>$("toast").style.display="none",1800)}
+function renderCats(){$("cats").innerHTML=tr().cats.map(([key,emoji,label])=>`<button class="cat ${cat===key?"active":""}" data-cat="${key}"><b>${emoji}</b>${label}</button>`).join("");document.querySelectorAll("[data-cat]").forEach(b=>b.onclick=()=>{cat=b.dataset.cat;showFav=false;render()})}
+function render(){let t=tr();$("heading").innerHTML=t.heading;$("subtitle").textContent=t.sub;$("spin").textContent=t.spin;$("again").textContent=t.again;$("save").textContent=t.save;$("resultLabel").textContent=t.label;$("ideasTitle").textContent=t.ideas;$("favToggle").textContent=t.favs;$("foot").textContent=t.foot;$("lang").textContent=lang==="fr"?"EN":"FR";renderCats();let list=activities().filter(a=>(cat==="Tout"||a.c.includes(cat))&&(!showFav||favorites().includes(a.key)));$("ideas").innerHTML=list.length?list.slice(0,8).map(a=>`<div class="idea"><div class="emoji">${a.e}</div><div><strong>${a.t}</strong><small>${a.c.join(" · ")}</small></div><button class="fav" data-key="${a.key}">${favorites().includes(a.key)?"♥":"♡"}</button></div>`).join(""):`<div class="empty">${t.empty}</div>`;document.querySelectorAll("[data-key]").forEach(b=>b.onclick=()=>toggleFav(b.dataset.key))}
+function toggleFav(key){let f=favorites();f=f.includes(key)?f.filter(x=>x!==key):[...f,key];localStorage.setItem("aleato_favs",JSON.stringify(f));toast(f.includes(key)?tr().saved:"");render()}
+function choose(){let list=activities().filter(a=>cat==="Tout"||a.c.includes(cat));if(!list.length)return;current=list[Math.floor(Math.random()*list.length)];turn+=1080+Math.floor(Math.random()*360);$("wheel").style.transform=`rotate(${turn}deg)`;$("spin").disabled=true;setTimeout(()=>{$("resultTitle").textContent=current.e+" "+current.t;$("resultDesc").textContent=current.d;$("result").style.display="block";$("spin").disabled=false},2300)}
+$("spin").onclick=choose;$("again").onclick=choose;$("save").onclick=()=>{if(current)toggleFav(current.key)};$("favToggle").onclick=()=>{showFav=!showFav;render()};$("lang").onclick=()=>{lang=lang==="fr"?"en":"fr";document.documentElement.lang=lang;current=null;$("result").style.display="none";render()};render();
+if("serviceWorker" in navigator && location.protocol!=="file:")window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+</script></body></html>

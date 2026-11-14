@@ -1,0 +1,18 @@
+{
+  "name": "ALÉATO — Laisse le hasard choisir",
+  "short_name": "ALÉATO",
+  "description": "Des idées d'activités au hasard, gratuitement.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#11101f",
+  "theme_color": "#11101f",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
